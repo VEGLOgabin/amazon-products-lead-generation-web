@@ -1,0 +1,7 @@
+streamlit
+playwright
+pandas
+plotly-express
+
+
+
