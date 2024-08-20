@@ -28,26 +28,53 @@ def amazon_products_lead_generation(product_name):
         # page = browser.new_page()
         page.goto(URL)
         
-        time.sleep(2)
+        page.wait_for_load_state('load')
+        
+        # time.sleep(20)
+        
+        # Delivery location changment
+        
+        # page.wait_for_selector('//*[@id="nav-global-location-popover-link"]')
+        
+        # page.locator('//*[@id="nav-global-location-popover-link"]').click()
+        
+        # page.wait_for_selector('//*[@id="GLUXCountryListDropdown"]/span/span')
+                               
+        # page.click('//*[@id="GLUXCountryListDropdown"]/span/span')
+        
+        # page.select_option('#GLUXCountryList', 'BJ')
+        
+        # # page.select_option('#GLUXCountryList', 'RW')
+        
+        
+        # page.click('//*[@id="a-popover-2"]/div/div[2]/span')
+        
+        
             
         
         page.wait_for_selector('input#twotabsearchtextbox', timeout=10000)
         page.locator("input#twotabsearchtextbox").fill(product_name)
         page.locator("input#nav-search-submit-button").click()
         
-        time.sleep(10)
+        page.wait_for_load_state('load')
+        
         up = True
         product_hrefs = []
         while up:
-            time.sleep(10)
+            page.wait_for_load_state('load')
             
-            page.wait_for_selector('a.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal', timeout=10000)
+            page.wait_for_selector('//*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div/div/div/span/div/div/div/div[2]/div/div', timeout=10000)
             
-            if page.locator("a.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal").count() > 0:
-                product_list = page.locator("a.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal").all()
+            if page.locator('//*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div/div/div/span/div/div/div/div[2]/div/div').count() > 0:
+                product_list = page.locator('//*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div/div/div/span/div/div/div/div[2]/div/div').all()
                 for product in product_list:
-                    href  = URL + product.get_attribute("href")
+                    if product.locator('xpath=div[4]/div[1]/div/div[4]/div/span[2]').count() > 0:
+                        price = product.locator('xpath=div[4]/div[1]/div/div[4]/div/span[2]').inner_text()
+                        print(price)
+                    href  = URL + product.locator('xpath=div[1]/h2/a').get_attribute("href")
+                    print(href)
                     product_hrefs.append(href)
+                    
                     
             try:      
                     
@@ -61,7 +88,7 @@ def amazon_products_lead_generation(product_name):
             except Exception   as e:
                 print(f"An error occurred: {e}")
                 
-            # up= False # It is for testing phase
+            up= False # It is for testing phase
                 
             
                 
@@ -70,8 +97,11 @@ def amazon_products_lead_generation(product_name):
             print(len(product_hrefs))
 
             for item in product_hrefs:
+               
                 page.goto(item)
-                time.sleep(3)      
+                time.sleep(3)     
+                page.wait_for_load_state('load') 
+                
                 Product_URL = page.url
                 print("----------------------------------------------------------------------------------------------------------------------------")
                 print(Product_URL)
@@ -128,11 +158,11 @@ def amazon_products_lead_generation(product_name):
                 else:
                     Product_Note = "N/A"
                     
-                if page.get_by_test_id("price-whole").count() > 0:
-                    Price = page.get_by_test_id("price-whole").first.inner_text().strip()
+                if page.locator('//*[@id="corePriceDisplay_desktop_feature_div"]/div[1]').count() > 0:
+                    Price = page.locator('//*[@id="corePriceDisplay_desktop_feature_div"]/div[1]').inner_text().strip()
                     print("----------------------------------------------------------------------------------------------------------------------------")
                     print(f'Price : {Price}')
-                    # data-testid="price-whole"
+                    
                     
                 else:
                     Price = None
